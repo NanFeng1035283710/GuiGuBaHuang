@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.ParticleSystem;
 
 /// <summary>
-/// ！
+/// 粒子子弹
 /// </summary>
 public class ProjectilesWeapon : MonoBehaviour
 {
@@ -13,7 +14,13 @@ public class ProjectilesWeapon : MonoBehaviour
     public int patternIndex = 0;
     public float fireRate = 0.3f;
     public WaitForSeconds waitFor;
-    public Transform target;
+    public Transform enemyPoint;
+
+    private CollisionModule collisionMode;
+    /// <summary>
+    /// 最短距离
+    /// </summary>
+    private float shortestDistance;
     private void Start()
     {
         ChoicePattern();
@@ -70,8 +77,7 @@ public class ProjectilesWeapon : MonoBehaviour
         }
     }
     /// <summary>
-    /// 追踪连发
-    /// 朝目标方向连发
+    ///  追踪相距最近的敌人连发子弹
     /// </summary>
     /// <returns></returns>
     private IEnumerator TraceModeCoroutine()
@@ -79,11 +85,15 @@ public class ProjectilesWeapon : MonoBehaviour
         EnableVelocityOverLifetimeModule(false);
         while (true)
         {
-            transform.LookAt(target.position);
-            for (int i = 0; i < 5; i++)
+            SetEnemy();
+            if (enemyPoint != null)
             {
-                Fire();
-                yield return new WaitForSeconds(0.3f);
+                transform.LookAt(enemyPoint.position);
+                for (int i = 0; i < 5; i++)
+                {
+                    Fire();
+                    yield return new WaitForSeconds(0.3f);
+                }
             }
             yield return new WaitForSeconds(fireRate * 5);
         }
@@ -123,9 +133,8 @@ public class ProjectilesWeapon : MonoBehaviour
             yield return new WaitForSeconds(fireRate * 5);
         }
     }
-
     /// <summary>
-    /// 弧形弹道
+    /// 追踪相距最近的敌人连发弧形弹道子弹
     /// </summary>
     /// <returns></returns>
     private IEnumerator ArcTrajectoryCroutine()
@@ -133,11 +142,15 @@ public class ProjectilesWeapon : MonoBehaviour
         EnableVelocityOverLifetimeModule(true);
         while (true)
         {
-            transform.LookAt(target.position);
-            for (int i = 0; i < 5; i++)
+            SetEnemy();
+            if (enemyPoint != null)
             {
-                Fire();
-                yield return new WaitForSeconds(0.3f);
+                transform.LookAt(enemyPoint.position);
+                for (int i = 0; i < 5; i++)
+                {
+                    Fire();
+                    yield return new WaitForSeconds(0.3f);
+                }
             }
             yield return new WaitForSeconds(fireRate * 5);
         }
@@ -158,10 +171,8 @@ public class ProjectilesWeapon : MonoBehaviour
         foreach (var ps in ParticleSystems)
             ps.Emit(1);
     }
-
-
     /// <summary>
-    /// 开启粒子系统的VelocityOverLifetimeModule模块
+    /// 开启关闭粒子系统的VelocityOverLifetimeModule模块
     /// </summary>
     /// <param name="isEnable">是否开启</param>
     private void EnableVelocityOverLifetimeModule(bool isEnable)
@@ -172,9 +183,36 @@ public class ProjectilesWeapon : MonoBehaviour
             velocityMode.enabled = isEnable;
         }
     }
-
-    private void OnParticleCollision(GameObject other)
+    public void SetParticleCollisionLayer(int id)
     {
-        Debug.Log(other);
+        collisionMode = ParticleSystems[0].collision;
+        //设置粒子碰撞层级.除自身外的所有层
+        collisionMode.collidesWith = ~(1 << id);
+    }
+    /// <summary>
+    /// 设置相距最近的的敌人为目标
+    /// </summary>
+    private void SetEnemy()
+    {
+        if (GameManager.Instance.players.Length > 1)
+        {
+            shortestDistance = 9999;
+            for (int i = 0; i < GameManager.Instance.players.Length; i++)
+            {
+                if (GameManager.Instance.players[i] != transform.parent.gameObject)
+                {
+                    float distance = Vector3.Distance(GameManager.Instance.players[i].transform.position, transform.position);
+                    if (distance < shortestDistance)
+                    {
+                        shortestDistance = distance;
+                        enemyPoint = GameManager.Instance.players[i].transform;
+                    }
+                }
+            }
+        }
+        else
+        {
+            enemyPoint = null;
+        }
     }
 }
