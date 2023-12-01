@@ -48,6 +48,10 @@ public class FlySwordController : MonoBehaviour
     private Vector3 targetDirection;
     private float timer;
     private bool isAtk;
+    /// <summary>
+    /// 最短距离
+    /// </summary>
+    private float shortestDistance;
     //拾取.. 
     //飞到轨道点
     //到达目标点后围绕飞行
@@ -72,14 +76,9 @@ public class FlySwordController : MonoBehaviour
         {
             if (isAtk)
             {
-
-                //如果当前目标不存在 则获取目标
-                if (enemyPoint == null || !enemyPoint.gameObject.activeSelf)
+                SetEnemy();
+                while (enemyPoint != null && Vector3.Distance(transform.position, enemyPoint.position) > 0.5f && enemyPoint.gameObject.activeSelf)
                 {
-                    RandomEnemy();
-                }
-                if (enemyPoint != null && Vector3.Distance(transform.position, enemyPoint.position) > 0.5f)
-                {  //目标方向等于目标位置减去自身位置
                     targetDirection = enemyPoint.position - transform.position;
                     //获取旋转角度  原点距离目标点的夹角 返回一个弧度   将弧度转换为角度
                     var angle = Mathf.Atan2(targetDirection.x, targetDirection.z) * Mathf.Rad2Deg;
@@ -91,13 +90,8 @@ public class FlySwordController : MonoBehaviour
                     transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
                     yield return null;
                 }
-                else
-                {
                     isAtk = false;
                     timer = 0;
-                }
-
-
             }
             else
             {   //飞往轨道点
@@ -134,18 +128,26 @@ public class FlySwordController : MonoBehaviour
             }
         }
     }
-
     /// <summary>
-    /// 获取随机敌人目标
+    /// 将相距最近的 敌人设置为目标
     /// </summary>
-    private void RandomEnemy()
+    private void SetEnemy()
     {
         if (GameManager.Instance.players.Length > 1)
         {
-            do
+            shortestDistance = 9999;
+            for (int i = 0; i < GameManager.Instance.players.Length; i++)
             {
-                enemyPoint = GameManager.Instance.players[Random.Range(0, GameManager.Instance.players.Length)].transform;
-            } while (enemyPoint == playerPoint);
+                if (GameManager.Instance.players[i].transform != playerPoint)
+                {
+                    float distance = Vector3.Distance(GameManager.Instance.players[i].transform.position, transform.position);
+                    if (distance < shortestDistance)
+                    {
+                        shortestDistance = distance;
+                        enemyPoint = GameManager.Instance.players[i].transform;
+                    }
+                }
+            }
         }
         else
         {

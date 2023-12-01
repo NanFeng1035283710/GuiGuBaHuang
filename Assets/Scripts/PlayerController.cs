@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
     private void RandomProject()
     {
         //随机子弹
-        projectilesWeapon = transform.GetChild(Random.Range(0, transform.childCount)).GetComponent<ProjectilesWeapon>();
+        projectilesWeapon = transform.GetChild(Random.Range(0, transform.childCount - 1)).GetComponent<ProjectilesWeapon>();
         //随机攻击模式
         projectilesWeapon.patternIndex = patternIndex;
         projectilesWeapon.gameObject.SetActive(true);
@@ -53,7 +53,8 @@ public class PlayerController : MonoBehaviour
 
         if (collision.gameObject.layer == 3)
         {
-            GetFlySword(collision.gameObject.name);
+            GetFlySword(collision.gameObject.tag);
+            FlySwordsManager.Instance.flySwordsTrophies.Remove(collision.gameObject);
             Destroy(collision.gameObject);
         }
     }

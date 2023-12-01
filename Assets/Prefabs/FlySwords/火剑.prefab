@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4160412311280512784}
   - component: {fileID: 4160412311280512787}
-  - component: {fileID: 6516553160203140290}
   - component: {fileID: 4160412311280512780}
   m_Layer: 0
   m_Name: "\u706B\u5251"
@@ -27,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4160412311280512785}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.483202, y: -0.00927639, z: 3.8486137}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -56,22 +55,6 @@ MonoBehaviour:
   playerPoint: {fileID: 0}
   trackPoint: {fileID: 0}
   enemyPoint: {fileID: 0}
---- !u!111 &6516553160203140290
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4160412311280512785}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Animation: {fileID: 0}
-  m_Animations:
-  - {fileID: 7400000, guid: 84e11f3b5b27a8b4abc018507bf65aea, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!65 &4160412311280512780
 BoxCollider:
   m_ObjectHideFlags: 0
